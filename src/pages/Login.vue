@@ -24,7 +24,6 @@ const handleLoginAction = async () => {
 
     try {
         const usuario = await signInWithEmailAndPassword(auth, email.value, password.value);
-        console.log(usuario);
         const token = await usuario.user.getIdToken();
         localStorage.setItem('token', token);
         router.push('/');
