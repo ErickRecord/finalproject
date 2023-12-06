@@ -47,6 +47,10 @@ const handleLoginAction = async () => {
     }
 }
 
+function handleRegisterPage() {
+    router.push("/register")
+}
+
 </script>
 
 <template>
@@ -56,6 +60,10 @@ const handleLoginAction = async () => {
             <div class="sesion-registro">
                 <img src="../assets/img/logo.png" alt="Logo">
                 <p>Ingresa a tu cuenta y disfruta de tus beneficios y de las mejores promociones que tenemos para ti.</p>
+                <div class="botones-sesion-registro">
+                    <button id="btn-sesion" class="activo">Iniciar sesion</button>
+                    <button id="btn-registro" @click="handleRegisterPage">Registrarse</button>
+                </div>
                 <form id="sesion-form">
                     <input type="text" v-model="email" name="correo" id="correo" placeholder="Correo"
                         autocomplete="username">
@@ -107,6 +115,19 @@ const handleLoginAction = async () => {
         h2 {
             margin-bottom: 10px;
             font-weight: bold;
+        }
+
+        .botones-sesion-registro {
+            margin-top: 30px;
+            margin-bottom: 10px;
+
+            button {
+                margin: 5px;
+                background-color: transparent;
+                border: none;
+                cursor: pointer;
+                outline: none !important;
+            }
         }
 
         form {
