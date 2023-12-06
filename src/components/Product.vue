@@ -1,6 +1,11 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-defineProps(['product']);
+const { product, updateShoppingCart } = defineProps(['product', 'updateShoppingCart']);
+
+function handleAddSProducthoppingCart() {
+    updateShoppingCart(product);
+}
+
 </script>
 
 
@@ -18,6 +23,7 @@ defineProps(['product']);
                 </div>
             </div>
         </RouterLink>
+        <button type="button" @click="handleAddSProducthoppingCart">Carrito</button>
     </div>
 </template>
 
