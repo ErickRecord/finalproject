@@ -1,45 +1,77 @@
 <script setup>
-import { onMounted } from 'vue'
-import { auth } from '../../firebase.js';
-import { signOut, onIdTokenChanged } from 'firebase/auth';
+import { ref } from 'vue';
+import Header from '../components/Header.vue'
+import Product from '../components/Product.vue'
+import ShoppingCart from '../components/ShoppingCart.vue'
+import Footer from '../components/Footer.vue'
+const products = ref([]);
+const shoppingCart = ref([]);
 
-onMounted(() => {
-    // Escucha cambios en el token de acceso
-    onIdTokenChanged(auth, async (user) => {
-        if (user) {
-            try {
-                // Obtener el token de acceso renovado
-                const refreshedToken = await user.getIdToken();
-                console.log('Token de acceso renovado:');
-                localStorage.setItem("token", refreshedToken);
-                // Ahora puedes utilizar el nuevo token de acceso según tus necesidades
-            } catch (error) {
-                console.error('Error al renovar el token de acceso:', error.message);
-            }
-        } else {
-            console.log('Usuario no autenticado o token de acceso no disponible');
-        }
-    });
-});
+const updateProducts = (searchResults) => {
+    // Updates the products property with the search results
+    products.value = [];
+    products.value = searchResults;
+};
+const updateShoppingCart = (product) => {
+    // Check if the product already exists in the cart
+    const existsProduct = shoppingCart.value.find((p) => p.nombre === product.nombre);
 
-
-const handleSignOut = async () => {
-    try {
-        await signOut(auth);
-        localStorage.removeItem("token");
-    } catch (error) {
-        console.error('Error al cerrar sesión:', error.message);
+    if (!existsProduct) {
+        shoppingCart.value.push(product);
+    } else {
+        alert("El producto ya está en el carrito.")
     }
 };
+
+const deleteShoppingCart = (productName) => {
+    const existsProductIndex = shoppingCart.value.findIndex((p) => p.nombre === productName);
+
+    if (existsProductIndex !== -1) {
+        shoppingCart.value.splice(existsProductIndex, 1);
+    }
+};
+
 
 </script>
 
 <template>
-    <div>
-        <h1>Index</h1>
-        <router-link to="/login">Iniciar sesion</router-link>
-        <button @click="handleSignOut()">Cerrar sesion</button>
-    </div>
+    <Header :updateProducts="updateProducts" :products="products" />
+    <section class="contenedor padding-nav">
+        <div v-if="products.value == []" class="padding-nav">
+            <p>No hay productos disponibles en este momento.</p>
+        </div>
+        <div v-else class="productos">
+            <div v-for="product in products" :key="product.id" class="producto">
+                <Product :product="product" :updateShoppingCart="updateShoppingCart" />
+            </div>
+        </div>
+    </section>
+    <ShoppingCart :shoppingCart="shoppingCart" :deleteShoppingCart="deleteShoppingCart" />
+    <Footer />
 </template>
 
-<style></style>
+<style lang="scss">
+@use "../assets/styles/responsive.scss";
+
+.productos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    .producto {
+        width: calc(100% - 10px);
+    }
+
+    @include responsive.tablet() {
+        .producto {
+            width: calc(33.3% - 10px);
+        }
+    }
+
+    @include responsive.laptop() {
+        .producto {
+            width: calc(25% - 10px);
+        }
+    }
+}
+</style>
