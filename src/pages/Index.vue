@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import Header from '../components/Header.vue'
 import Product from '../components/Product.vue'
 import ShoppingCart from '../components/ShoppingCart.vue'
+import Footer from '../components/Footer.vue'
 const products = ref([]);
 const shoppingCart = ref([]);
 
@@ -44,9 +45,9 @@ const deleteShoppingCart = (productName) => {
                 <Product :product="product" :updateShoppingCart="updateShoppingCart" />
             </div>
         </div>
-
     </section>
     <ShoppingCart :shoppingCart="shoppingCart" :deleteShoppingCart="deleteShoppingCart" />
+    <Footer />
 </template>
 
 <style lang="scss">
