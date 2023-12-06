@@ -2,9 +2,16 @@
 import { onMounted, ref } from 'vue';
 import { auth } from '../../firebase.js';
 import { signOut, onIdTokenChanged } from 'firebase/auth';
+import { db } from '../../firebase.js';
+import { getDocs, collection, query, where } from 'firebase/firestore';
+//Props
+const { products, updateProducts } = defineProps(['products', 'updateProducts']);
 
 const isLoginIn = ref(false);
+const searchValue = ref("");
+
 onMounted(() => {
+    handleGetProducts();
     // Listen for access token changes
     onIdTokenChanged(auth, async (userL) => {
         if (userL) {
@@ -30,6 +37,35 @@ const handleSignOut = async () => {
         console.error('Error al cerrar sesión:', error.message);
     }
 };
+
+
+async function handleGetProducts() {
+    const productsLocal = [];
+
+    if (searchValue.value === "") {
+        // Make a query to get all the products
+        let productosCollection = await getDocs(collection(db, "productos"));
+        productosCollection.forEach((product) => {
+            productsLocal.push({ ...product.data(), id: product.id });
+        });
+    } else {
+        // Perform a query to find products that contain the search string
+        let productosCollection = await getDocs(
+            query(
+                collection(db, "productos"),
+                where("nombre", "==", searchValue.value),
+            )
+        );
+
+        productosCollection.forEach((product) => {
+            productsLocal.push({ ...product.data(), id: product.id });
+        });
+    }
+
+    // Update the view with the products found
+    updateProducts(productsLocal);
+}
+
 </script>
 
 
@@ -37,8 +73,9 @@ const handleSignOut = async () => {
     <nav class="navegacion">
         <div class="info-nav contenedor">
             <router-link to="/"><img src="../assets/img/logo.png" alt="Logo"></router-link>
-            <form class="buscador">
-                <input type="text" name="buscar" id="buscar-input" placeholder="Hola. ¿Qué estas buscado?">
+            <form @submit.prevent="handleGetProducts" class="buscador">
+                <input type="text" v-model="searchValue" name="buscar" id="buscar-input"
+                    placeholder="Hola. ¿Qué estas buscado?">
                 <button type="submit" class="buscar-boton"><font-awesome-icon
                         icon="fa-solid fa-magnifying-glass" /></button>
             </form>
